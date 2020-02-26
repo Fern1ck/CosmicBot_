@@ -1,6 +1,12 @@
 import requests, shutil, os, time
 from secret import NASA_API_KEY
 
+def Link_format(link): #Se formatea los links de youtube para que muestren una preview en el tweet
+    if("embed/" in link):
+        return link.replace("embed/", "watch?v=")
+    else:
+        return link
+
 def Apod_fetch():
     APOD_ENDPOINT = "https://api.nasa.gov/planetary/apod"
     apod = requests.get(APOD_ENDPOINT, params= {"hd": True, "api_key": NASA_API_KEY})
@@ -29,7 +35,8 @@ def Apod_post(api):
         print("[" + str(tiempo.tm_hour) + ":" +  str(tiempo.tm_min) + ":" + str(tiempo.tm_sec) + "] Se publico el APOD: " + Estado + "con la imagen " + img_path +  "\n")
         os.remove(img_path)
     else:
-        Estado = "Check out the Astronomy Video of the Day!: " + APOD["title"] + "\n#AVOD"
+        URL= Link_format(APOD["url"])
+        Estado = APOD["title"] + " " + URL + "\n#AVOD"
         api.update_status(status= Estado)
         tiempo = time.localtime(time.time())
         print("[" + str(tiempo.tm_hour) + ":" +  str(tiempo.tm_min) + ":" + str(tiempo.tm_sec) + "] Se publico el AVOD: " + Estado + " con el video " + APOD['url'] + "\n")
