@@ -1,4 +1,5 @@
-import requests, shutil, os, time
+import requests, shutil, os, time, tweepy
+from funcs import isOriginal
 from secret import NASA_API_KEY
 
 def Link_format(link): #Se formatea los links de youtube para que muestren una preview en el tweet
@@ -18,26 +19,35 @@ def Apod_fetch():
         return None
 
 def Apod_post(api):
+    TIMELINE_ACTUAL= tweepy.Cursor(api.user_timeline, screen_name=api.me().screen_name, tweet_mode="extended").items()
+    Tweets = []
+    for x in TIMELINE_ACTUAL:
+        Tweets.append(x._json["full_text"])
     #Pedido a APOD API 
     APOD = Apod_fetch()
-    if(APOD["type"] == "image"):
-        #Descargar imagen localmente para despues adjuntarla al tweet
-        res = requests.get(APOD["url"], stream=True)
-        img_path = "img.jpeg"
-        with open(img_path, "wb") as out_file:
-            shutil.copyfileobj(res.raw, out_file)
-        del res
+    if(isOriginal(APOD["title"], Tweets)):
+        if(APOD["type"] == "image"):    
+            #Descargar imagen localmente para despues adjuntarla al tweet
+            res = requests.get(APOD["url"], stream=True)
+            img_path = "img.jpeg"
+            with open(img_path, "wb") as out_file:
+                shutil.copyfileobj(res.raw, out_file)
+            del res
 
-        #Subir tweet con foto
-        Estado = APOD["title"] + "\n#APOD"
-        api.update_with_media(status= Estado, filename = img_path)
-        tiempo = time.localtime(time.time())
-        print("[" + str(tiempo.tm_hour) + ":" +  str(tiempo.tm_min) + ":" + str(tiempo.tm_sec) + "] Se publico el APOD: " + Estado + "con la imagen " + img_path +  "\n")
-        os.remove(img_path)
+            #Subir tweet con foto
+            Estado = '"' + APOD["title"] + '" #APOD #Astronomy #Nasa'
+            api.update_with_media(status= Estado, filename = img_path)
+            tiempo = time.localtime(time.time())
+            print("[" + str(tiempo.tm_hour) + ":" +  str(tiempo.tm_min) + ":" + str(tiempo.tm_sec) + "] Se publico el APOD: " + Estado + " con la imagen " + img_path +  "\n")
+            os.remove(img_path)
+        else:
+            URL= Link_format(APOD["url"])
+            Estado = APOD["title"] + " " + URL + " #APOD #Astronomy #Nasa"
+            api.update_status(status= Estado)
+            tiempo = time.localtime(time.time())
+            print("[" + str(tiempo.tm_hour) + ":" +  str(tiempo.tm_min) + ":" + str(tiempo.tm_sec) + "] Se publico el AVOD: " + Estado + " con el video " + APOD['url'] + "\n")
     else:
-        URL= Link_format(APOD["url"])
-        Estado = APOD["title"] + " " + URL + "\n#AVOD"
-        api.update_status(status= Estado)
         tiempo = time.localtime(time.time())
-        print("[" + str(tiempo.tm_hour) + ":" +  str(tiempo.tm_min) + ":" + str(tiempo.tm_sec) + "] Se publico el AVOD: " + Estado + " con el video " + APOD['url'] + "\n")
+        print("[" + str(tiempo.tm_hour) + ":" +  str(tiempo.tm_min) + ":" + str(tiempo.tm_sec) + "] El APOD de la NASA " + APOD["title"] + " ya fue publicado en el timeline. No se publicó nada ahora mismo.")
+        del APOD
     return None
