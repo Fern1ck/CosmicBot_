@@ -1,4 +1,5 @@
 import praw, random, requests, shutil, os, time, tweepy, funcs
+from datetime import datetime
 from secret import REDDIT_CLIENT_ID, REDDIT_SECRET, REDDIT_ACC_PASS, REDDIT_ACC_USER, REDDIT_USER_AGENT, Subreddits_list
 
 reddit = praw.Reddit(client_id=REDDIT_CLIENT_ID,
@@ -7,11 +8,13 @@ reddit = praw.Reddit(client_id=REDDIT_CLIENT_ID,
                     user_agent=REDDIT_USER_AGENT,
                     username=REDDIT_ACC_USER)
 
-def Choose_subreddit(): #Elige algun subreddit al azar
-    return random.choice(Subreddits_list)
+def Choose_subreddit(type): #Elige algun subreddit al azar 
+    Z = funcs.Scheduling(type)
+    Chosen_sub= Z.get_NextSub()
+    return Chosen_sub
 
 def get_top(chosen_sub, LIMITE, Tweets): 
-    for post in reddit.subreddit(chosen_sub).top(time_filter= 'month', limit=LIMITE): 
+    for post in reddit.subreddit(chosen_sub).top(time_filter= 'all', limit=LIMITE): 
         if(funcs.isOriginal(post.title, Tweets)):
             print(post.title + " ====> ES ORIGINAL")
             return post
@@ -19,8 +22,8 @@ def get_top(chosen_sub, LIMITE, Tweets):
             print(post.title + " ====> NO ES ORIGINAL")
     return get_top(chosen_sub, LIMITE + 30, Tweets)
 
-def Reddit_top_post(api):
-    chosen_sub = Choose_subreddit()
+def Top_post(api):
+    chosen_sub = Choose_subreddit("TOP_last_sub.txt")
     TIMELINE_ACTUAL= tweepy.Cursor(api.user_timeline, screen_name=api.me().screen_name, tweet_mode="extended").items()
     Tweets = []
     for x in TIMELINE_ACTUAL:
@@ -48,29 +51,32 @@ def Reddit_top_post(api):
             funcs.Redimensionar(img_path)
             try:
                 api.update_with_media(filename= img_path, status= Estado + " #Astronomy #Space") #Subir tweet con foto 
+                Z = funcs.Scheduling("TOP_last_sub.txt")
+                Z.set_NewSub(chosen_sub)
             except tweepy.error.TweepError as e:
                 if("'code': 186" in str(e)):
                     pass #AGREGAR ID A LISTA PARA NO PUBLICAR
         except:
             try:
                 api.update_status(status= Estado + " " + submission.url + " #Astronomy #Space")
+                Z = funcs.Scheduling("TOP_last_sub.txt")
+                Z.set_NewSub(chosen_sub)
+                print("[" + funcs.getTime() + "] Se publico el tweet del subreddit: " + chosen_sub + "\n")
             except tweepy.error.TweepError as e:
                 if("'code': 186" in str(e)):
                     pass #AGREGAR ID A LISTA PARA NO PUBLICAR
 
         os.remove(img_path)
-        tiempo = time.localtime(time.time())
-        print("[" + str(tiempo.tm_hour) + ":" + str(tiempo.tm_min) + ":" + str(tiempo.tm_sec) + "] Se publico el tweet\n")
     else:
         #Subir tweet con el link de lo adjuntado
         try:
             api.update_status(status= Estado + " " + submission.url + " #Astronomy #Space")
+            Z = funcs.Scheduling("TOP_last_sub.txt")
+            Z.set_NewSub(chosen_sub)
+            print("[" + funcs.getTime() + "] Se publico el tweet del subreddit: " + chosen_sub + "\n")
         except tweepy.error.TweepError as e:
                 if("'code': 186" in str(e)):
                     pass #AGREGAR ID A LISTA PARA NO PUBLICAR
-                
-        tiempo = time.localtime(time.time())
-        print("[" + str(tiempo.tm_hour) + ":" + str(tiempo.tm_min) + ":" + str(tiempo.tm_sec) + "] Se publico el tweet\n")
     return None
 
 def get_new(chosen_sub, LIMITE, Tweets): 
@@ -89,8 +95,8 @@ def get_new(chosen_sub, LIMITE, Tweets):
             print(post.title + " ====> NO ES ORIGINAL")
     return get_new(chosen_sub, LIMITE + 5, Tweets)
 
-def Reddit_new_post(api):
-    chosen_sub = random.choice(Subreddits_list)
+def New_post(api):
+    chosen_sub = Choose_subreddit("BEST5_last_sub.txt")
     TIMELINE_ACTUAL= tweepy.Cursor(api.user_timeline, screen_name=api.me().screen_name, tweet_mode="extended").items()
     Tweets = []
     for x in TIMELINE_ACTUAL:
@@ -120,27 +126,31 @@ def Reddit_new_post(api):
             funcs.Redimensionar(img_path)
             try:
                 api.update_with_media(filename= img_path, status= Estado + " #Astronomy #Space")
+                Z = funcs.Scheduling("BEST5_last_sub.txt")
+                Z.set_NewSub(chosen_sub)
             except tweepy.error.TweepError as e:
                 if("'code': 186" in str(e)):
                     pass #AGREGAR ID A LISTA PARA NO PUBLICAR
         except:
             try:
                 api.update_status(status= Estado + " " + best_one.url + " #Astronomy #Space")
+                Z = funcs.Scheduling("BEST5_last_sub.txt")
+                Z.set_NewSub(chosen_sub)
+                print("[" + funcs.getTime() + "] Se publico el tweet del subreddit: " + chosen_sub + "\n")
             except tweepy.error.TweepError as e:
                 if("'code': 186" in str(e)):
                     pass #AGREGAR ID A LISTA PARA NO PUBLICAR
         
         os.remove(img_path)
-        tiempo = time.localtime(time.time())
-        print("[" + str(tiempo.tm_hour) + ":" +  str(tiempo.tm_min) + ":" + str(tiempo.tm_sec) + "] Se publico el tweet.\n")
     else:
         #Subir tweet con el link de lo adjuntado
         try:
             api.update_status(status= Estado + " " + best_one.url + " #Astronomy #Space")
+            Z = funcs.Scheduling("BEST5_last_sub.txt")
+            Z.set_NewSub(chosen_sub)
+            print("[" + funcs.getTime() + "] Se publico el tweet del subreddit: " + chosen_sub + "\n")
         except tweepy.error.TweepError as e:
             if("'code': 186" in str(e)):
-                    pass #AGREGAR ID A LISTA PARA NO PUBLICAR
+                pass #AGREGAR ID A LISTA PARA NO PUBLICAR
 
-        tiempo = time.localtime(time.time())
-        print("[" + str(tiempo.tm_hour) + ":" +  str(tiempo.tm_min) + ":" + str(tiempo.tm_sec) + "] Se publico el mejor post mas reciente del subreddit " + str(best_one.subreddit) + "\n")
     return None

@@ -1,4 +1,5 @@
-import tweepy, requests, schedule, time, redditAPI, nasaAPI, astronauts
+import tweepy, requests, schedule, redditAPI, nasaAPI, astronauts, time
+from funcs import getTime
 from secret import TWIITER_CONSUMER_KEY, TWIITER_CONSUMER_SECRET, TWIITER_ACCESS_TOKEN, TWIITER_ACCESS_TOKEN_SECRET
 
 #Autenticacion del bot
@@ -12,23 +13,20 @@ TOP_TIME= "17:00"
 NEW_TIME= "22:00"
 SEGUNDOS = 5
 
-#astronauts.get_Astronauts(api)
-#nasaAPI.Apod_post(api)
-#redditAPI.Reddit_top_post(api)
-for i in range(2):    
-    redditAPI.Reddit_new_post(api)
-    redditAPI.Reddit_top_post(api)
+#astronauts.Post(api)
+#nasaAPI.Post(api)
+#redditAPI.Top_post(api)
+for i in range(3):
+    redditAPI.New_post(api)
+    redditAPI.Top_post(api)
 
-"""
-#schedule.every().day.at(ASTRONAUTS).do(astronauts.get_Astronauts, api)
-#schedule.every().day.at(ASAP_TIME).do(nasaAPI.Apod_post, api)
-#schedule.every().day.at(TOP_TIME).do(redditAPI.Reddit_top_post, api)
-#schedule.every().day.at(NEW_TIME).do(redditAPI.Reddit_new_post, api)
 
-print("[" + str(time.localtime(time.time()).tm_hour) + ":" +  str(time.localtime(time.time()).tm_min) + ":" + str(time.localtime(time.time()).tm_sec) + "] Empiezan a ejecutarse las tareas...")
+schedule.every().day.at(ASTRONAUTS).do(astronauts.Post, api)
+schedule.every().day.at(ASAP_TIME).do(nasaAPI.Post, api)
+schedule.every().day.at(TOP_TIME).do(redditAPI.Top_post, api)
+schedule.every().day.at(NEW_TIME).do(redditAPI.New_post, api)
+print("[" + getTime() + "] Empiezan a ejecutarse las tareas...")
 while(True):
     schedule.run_pending()
-    tiempo = time.localtime(time.time())
-    print("[" + str(tiempo.tm_hour) + ":" +  str(tiempo.tm_min) + ":" + str(tiempo.tm_sec) + "] La ejecución se para por " + str(SEGUNDOS) + " segundos.")
-    time.sleep(2) #Evita la ejecucion constante del bucle
-"""
+    print("[" + getTime() + "] La ejecución se para por " + str(SEGUNDOS) + " segundos.")
+    time.sleep(SEGUNDOS) #Evita la ejecucion constante del bucle

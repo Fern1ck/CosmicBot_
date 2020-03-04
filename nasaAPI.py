@@ -1,5 +1,6 @@
-import requests, shutil, os, time, tweepy
-from funcs import isOriginal
+import requests, shutil, os, tweepy
+from datetime import datetime
+from funcs import isOriginal, getTime
 from secret import NASA_API_KEY
 
 def Link_format(link): #Se formatea los links de youtube para que muestren una preview en el tweet
@@ -15,10 +16,10 @@ def Apod_fetch():
         apod = apod.json()
         return {"title": apod["title"], "url": apod["url"], "type": apod["media_type"]}
     else:
-        print("HUBO UN ERROR EN EL PEDIDO DE APOD: " + apod)
+        print("[" + getTime() + "] Hubo un error en el pedido de APOD: " + apod)
         return None
 
-def Apod_post(api):
+def Post(api):
     TIMELINE_ACTUAL= tweepy.Cursor(api.user_timeline, screen_name=api.me().screen_name, tweet_mode="extended").items()
     Tweets = []
     for x in TIMELINE_ACTUAL:
@@ -37,17 +38,14 @@ def Apod_post(api):
             #Subir tweet con foto
             Estado = '"' + APOD["title"] + '" #APOD #Astronomy #Nasa'
             api.update_with_media(status= Estado, filename = img_path)
-            tiempo = time.localtime(time.time())
-            print("[" + str(tiempo.tm_hour) + ":" +  str(tiempo.tm_min) + ":" + str(tiempo.tm_sec) + "] Se publico el APOD: " + Estado + " con la imagen " + img_path +  "\n")
+            print("[" + getTime() + "] Se publico el APOD: " + Estado + " con la imagen " + img_path +  "\n")
             os.remove(img_path)
         else:
             URL= Link_format(APOD["url"])
             Estado = APOD["title"] + " " + URL + " #APOD #Astronomy #Nasa"
             api.update_status(status= Estado)
-            tiempo = time.localtime(time.time())
-            print("[" + str(tiempo.tm_hour) + ":" +  str(tiempo.tm_min) + ":" + str(tiempo.tm_sec) + "] Se publico el AVOD: " + Estado + " con el video " + APOD['url'] + "\n")
+            print("[" + getTime() + "] Se publico el AVOD: " + Estado + " con el video " + APOD['url'] + "\n")
     else:
-        tiempo = time.localtime(time.time())
-        print("[" + str(tiempo.tm_hour) + ":" +  str(tiempo.tm_min) + ":" + str(tiempo.tm_sec) + "] El APOD de la NASA " + APOD["title"] + " ya fue publicado en el timeline. No se publicó nada ahora mismo.")
+        print("[" + getTime() + "] El APOD de la NASA " + APOD["title"] + " ya fue publicado en el timeline. No se publicó nada ahora mismo.")
         del APOD
     return None
