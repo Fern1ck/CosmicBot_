@@ -3,6 +3,7 @@ from datetime import datetime
 from funcs import getTime
 
 def Post(api):
+    print("[" + getTime() + "] Se empieza la funcion de nasaAPI.py: Post(api)")
     # Si no es el primer dia del mes no hace nada
     day_of_month = datetime.today().day
     if day_of_month != 1:
@@ -15,7 +16,7 @@ def Post(api):
             count = astro.json()["number"]
             if(count > 0):
                 Crafts = []
-                Estado = "At the moment, there are " + str(count) + " astronauts in space: "
+                Estado = "At the moment, there are " + str(count) + " astronauts in space! "
                 for i in astro.json()["people"]:
                     if(count > 0):
                         Estado = Estado + i["name"]
@@ -41,4 +42,5 @@ def Post(api):
                 print("[" + getTime() + "] Se publicó el estado con los astronautas actuales en el espacio.")
     except:
         print("[" + getTime() + "] Hubo un error en el fetch o publicación de los astronautas. No se publicó el estado de los astronautas.")
+    print("[" + getTime() + "] Se termina la funcion de nasaAPI.py: Post(api)")
     return None

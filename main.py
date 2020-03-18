@@ -13,18 +13,11 @@ TOP_TIME= "17:00"
 NEW_TIME= "22:00"
 SEGUNDOS = 5
 
-#astronauts.Post(api)
-#nasaAPI.Post(api)
-#redditAPI.Top_post(api)
-for i in range(3):
-    redditAPI.New_post(api)
-    redditAPI.Top_post(api)
-
-
 schedule.every().day.at(ASTRONAUTS).do(astronauts.Post, api)
 schedule.every().day.at(ASAP_TIME).do(nasaAPI.Post, api)
 schedule.every().day.at(TOP_TIME).do(redditAPI.Top_post, api)
 schedule.every().day.at(NEW_TIME).do(redditAPI.New_post, api)
+
 print("[" + getTime() + "] Empiezan a ejecutarse las tareas...")
 while(True):
     schedule.run_pending()
