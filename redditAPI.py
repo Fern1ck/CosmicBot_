@@ -1,12 +1,12 @@
 import praw, random, requests, shutil, os, time, tweepy, funcs
 from datetime import datetime
-from secret import REDDIT_CLIENT_ID, REDDIT_SECRET, REDDIT_ACC_PASS, REDDIT_ACC_USER, REDDIT_USER_AGENT, Subreddits_list
+from variables import REDDIT_CLIENT_ID, REDDIT_SECRET, REDDIT_ACC_PASS, REDDIT_ACC_USER, REDDIT_USER_AGENT, Subreddits_list, PostsToAvoid
 
 reddit = praw.Reddit(client_id=REDDIT_CLIENT_ID,
                     client_secret=REDDIT_SECRET,
+                    username=REDDIT_ACC_USER,
                     password=REDDIT_ACC_PASS,
-                    user_agent=REDDIT_USER_AGENT,
-                    username=REDDIT_ACC_USER)
+                    user_agent=REDDIT_USER_AGENT)
 
 def Choose_subreddit(type): #Elige algun subreddit al azar 
     Z = funcs.Scheduling(type)
@@ -15,8 +15,7 @@ def Choose_subreddit(type): #Elige algun subreddit al azar
 
 def get_top(chosen_sub, LIMITE, Tweets): 
     for post in reddit.subreddit(chosen_sub).top(time_filter= 'all', limit=LIMITE): 
-        x = funcs.LongTweet()
-        if(funcs.isOriginal(post.title, Tweets) and x.CheckInPosts(funcs.process_title(post.title))):
+        if(funcs.isOriginal(post.title, Tweets) and funcs.CheckInPosts(funcs.process_title(post.title))):
             print("[" + funcs.getTime() + "] Se procesa: " +  post.title)
             return post
     return get_top(chosen_sub, LIMITE + 30, Tweets)
@@ -56,15 +55,13 @@ def Top_post(api):
                     print("[" + funcs.getTime() + "] Se publico el tweet del subreddit: " + chosen_sub)
                 except tweepy.error.TweepError as e:
                     if("'code': 186" in str(e)):
-                        x = funcs.LongTweet()
-                        x.set_PostToAvoid(funcs.process_title(submission.title))
+                        PostsToAvoid.append(funcs.process_title(submission.title))
                         print("[" + funcs.getTime() + "] Se agrego a los posts para no publicar: " + funcs.process_title(submission.title) + ". Se ejecutara de nuevo la función.")
                         Top_post(api)
                     else:
                         print(str(e))
             else:
-                x = funcs.LongTweet()
-                x.set_PostToAvoid(funcs.process_title(submission.title))
+                PostsToAvoid.append(funcs.process_title(submission.title))
                 print("[" + funcs.getTime() + "] Se agrego a los posts para no publicar: " + funcs.process_title(submission.title) + ". Se ejecutara de nuevo la función.")
                 Top_post(api)
         except:
@@ -75,8 +72,7 @@ def Top_post(api):
                 print("[" + funcs.getTime() + "] Se publico el tweet del subreddit: " + chosen_sub)
             except tweepy.error.TweepError as e:
                 if("'code': 186" in str(e)):
-                    x = funcs.LongTweet()
-                    x.set_PostToAvoid(funcs.process_title(submission.title))
+                    PostsToAvoid.append(funcs.process_title(submission.title))
                     print("[" + funcs.getTime() + "] Se agrego a los posts para no publicar: " + funcs.process_title(submission.title) + ". Se ejecutara de nuevo la función.")
                     Top_post(api)
                 else:
@@ -95,8 +91,7 @@ def Top_post(api):
             print("[" + funcs.getTime() + "] Se publico el tweet del subreddit: " + chosen_sub)
         except tweepy.error.TweepError as e:
                 if("'code': 186" in str(e)):
-                    x = funcs.LongTweet()
-                    x.set_PostToAvoid(funcs.process_title(submission.title))
+                    PostsToAvoid.append(funcs.process_title(submission.title))
                     print("[" + funcs.getTime() + "] Se agrego a los posts para no publicar: " + funcs.process_title(submission.title) + ". Se ejecutara de nuevo la función.")
                     Top_post(api)
                 else:
@@ -113,8 +108,7 @@ def get_new(chosen_sub, LIMITE, Tweets):
     submissions_list.sort(key= lambda x: x.ups, reverse= True)
 
     for post in submissions_list:
-        x = funcs.LongTweet()
-        if(funcs.isOriginal(post.title, Tweets) and x.CheckInPosts(funcs.process_title(post.title))):
+        if(funcs.isOriginal(post.title, Tweets) and funcs.CheckInPosts(funcs.process_title(post.title))):
             print("[" + funcs.getTime() + "] Se procesa: " +  post.title)
             return post
     return get_new(chosen_sub, LIMITE + 5, Tweets)
@@ -156,15 +150,13 @@ def New_post(api):
                     print("[" + funcs.getTime() + "] Se publico el tweet del subreddit: " + chosen_sub)
                 except tweepy.error.TweepError as e:
                     if("'code': 186" in str(e)):
-                        x = funcs.LongTweet()
-                        x.set_PostToAvoid(funcs.process_title(best_one.title))
+                        PostsToAvoid.append(funcs.process_title(best_one.title))
                         print("[" + funcs.getTime() + "] Se agrego a los posts para no publicar: " + funcs.process_title(best_one.title) + ". Se ejecutara de nuevo la función.")
                         New_post(api)
                     else:
                         print(str(e))
             else:
-                x = funcs.LongTweet()
-                x.set_PostToAvoid(funcs.process_title(best_one.title))
+                PostsToAvoid.append(funcs.process_title(best_one.title))
                 print("[" + funcs.getTime() + "] Se agrego a los posts para no publicar: " + funcs.process_title(best_one.title) + ". Se ejecutara de nuevo la función.")
                 New_post(api)
         except:
@@ -175,8 +167,7 @@ def New_post(api):
                 print("[" + funcs.getTime() + "] Se publico el tweet del subreddit: " + chosen_sub)
             except tweepy.error.TweepError as e:
                 if("'code': 186" in str(e)):
-                    x = funcs.LongTweet()
-                    x.set_PostToAvoid(funcs.process_title(best_one.title))
+                    PostsToAvoid.append(funcs.process_title(best_one.title))
                     print("[" + funcs.getTime() + "] Se agrego a los posts para no publicar: " + funcs.process_title(best_one.title) + ". Se ejecutara de nuevo la función.")
                     New_post(api)
                 else:
@@ -195,8 +186,7 @@ def New_post(api):
             print("[" + funcs.getTime() + "] Se publico el tweet del subreddit: " + chosen_sub)
         except tweepy.error.TweepError as e:
             if("'code': 186" in str(e)):
-                x = funcs.LongTweet()
-                x.set_PostToAvoid(funcs.process_title(best_one.title))
+                PostsToAvoid.append(funcs.process_title(best_one.title))
                 print("[" + funcs.getTime() + "] Se agrego a los posts para no publicar: " + funcs.process_title(best_one.title) + ". Se ejecutara de nuevo la función.")
                 New_post(api)
             else:

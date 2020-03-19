@@ -1,7 +1,7 @@
 import requests, shutil, os, tweepy
 from datetime import datetime
 from funcs import isOriginal, getTime
-from secret import NASA_API_KEY
+from variables import NASA_API_KEY
 
 def Link_format(link): #Se formatea los links de youtube para que muestren una preview en el tweet
     if("embed/" in link):

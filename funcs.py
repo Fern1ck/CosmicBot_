@@ -2,7 +2,7 @@ from PIL import Image #Necesario para redimensionar la imagen
 from os import path
 from datetime import datetime
 from resizeimage import resizeimage #Necesario para redimensionar la imagen
-from secret import Subreddits_list
+from variables import Subreddits_list, PostsToAvoid
 
 def process_title(titulo): #Procesa los titulos de los posts en reddit.
     if(" [OC]" in titulo):
@@ -69,7 +69,6 @@ class Scheduling():
             file = open(self.path, "w") #Lo crea
             file.close()
             file = open(self.path, "r+") #Abrir para lectura y escritura
-            file.write(Subreddits_list[0].lower().capitalize())
         return file
 
     def __get_LastSub(self):
@@ -80,6 +79,9 @@ class Scheduling():
 
     def get_NextSub(self):
         contents = self.__get_LastSub()
+        if(contents == ""):
+            contents = Subreddits_list[0].lower().capitalize()
+
         NextSubIndex= Subreddits_list.index(contents) + 1
         try:
             NextSub = Subreddits_list[NextSubIndex]
@@ -98,37 +100,10 @@ class Scheduling():
         f.close()
         return None
 
-class LongTweet():
-    """ 
-    Clase que se encarga de escribir a un archivo todos los posts que 
-    llevan a una excepción de Tweepy por tener un texto muy largo
-    """
-    __path = "AvoidThesePosts.txt"
-
-    def __OpenFile(self):
-        try:
-            file = open(self.__path, "a+") #Abrir 
-        except FileNotFoundError:
-            file = open(self.__path, "w") #Lo crea
-            file.close()
-            file = open(self.__path, "a+") #Abrir 
-        return file
-
-    def __get_Posts(self):
-        f = self.__OpenFile()
-        f.seek(0)
-        PostsToAvoid = f.read()
-        f.close()
-        return PostsToAvoid
-
-    def CheckInPosts(self, POST):
-        if(POST in self.__get_Posts()):
-            return False
-        else:
-            return True
-
-    def set_PostToAvoid(self, POST):
-        f = self.__OpenFile()
-        f.write(POST + "\n")
-        f.close()
-        return None
+def CheckInPosts(POST):
+    #Verificar si el post que se quiere publicar
+    #presenta una excepcion por tener un texto largo.
+    if(POST in PostsToAvoid):
+        return False
+    else:
+        return True
