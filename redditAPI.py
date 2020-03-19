@@ -1,5 +1,4 @@
 import praw, random, requests, shutil, os, time, tweepy, funcs
-from datetime import datetime
 from variables import REDDIT_CLIENT_ID, REDDIT_SECRET, REDDIT_ACC_PASS, REDDIT_ACC_USER, REDDIT_USER_AGENT, Subreddits_list, PostsToAvoid
 
 reddit = praw.Reddit(client_id=REDDIT_CLIENT_ID,
@@ -16,12 +15,12 @@ def Choose_subreddit(type): #Elige algun subreddit al azar
 def get_top(chosen_sub, LIMITE, Tweets): 
     for post in reddit.subreddit(chosen_sub).top(time_filter= 'all', limit=LIMITE): 
         if(funcs.isOriginal(post.title, Tweets) and funcs.CheckInPosts(funcs.process_title(post.title))):
-            print("[" + funcs.getTime() + "] Se procesa: " +  post.title)
+            print("Se procesa: " +  post.title)
             return post
     return get_top(chosen_sub, LIMITE + 30, Tweets)
 
 def Top_post(api):
-    print("[" + funcs.getTime() + "] Se empieza la función de redditAPI.py: Top_post(api)")
+    print("Se empieza la función de redditAPI.py: Top_post(api)")
     chosen_sub = Choose_subreddit("TOP_last_sub.txt")
     TIMELINE_ACTUAL= tweepy.Cursor(api.user_timeline, screen_name=api.me().screen_name, tweet_mode="extended").items()
     Tweets = []
@@ -52,28 +51,28 @@ def Top_post(api):
                     api.update_with_media(filename= img_path, status= Estado + " #Astronomy #Space") #Subir tweet con foto 
                     Z = funcs.Scheduling("TOP_last_sub.txt")
                     Z.set_NewSub(chosen_sub)
-                    print("[" + funcs.getTime() + "] Se publico el tweet del subreddit: " + chosen_sub)
+                    print("Se publico el tweet del subreddit: " + chosen_sub)
                 except tweepy.error.TweepError as e:
                     if("'code': 186" in str(e)):
                         PostsToAvoid.append(funcs.process_title(submission.title))
-                        print("[" + funcs.getTime() + "] Se agrego a los posts para no publicar: " + funcs.process_title(submission.title) + ". Se ejecutara de nuevo la función.")
+                        print("Se agrego a los posts para no publicar: " + funcs.process_title(submission.title) + ". Se ejecutara de nuevo la función.")
                         Top_post(api)
                     else:
                         print(str(e))
             else:
                 PostsToAvoid.append(funcs.process_title(submission.title))
-                print("[" + funcs.getTime() + "] Se agrego a los posts para no publicar: " + funcs.process_title(submission.title) + ". Se ejecutara de nuevo la función.")
+                print("Se agrego a los posts para no publicar: " + funcs.process_title(submission.title) + ". Se ejecutara de nuevo la función.")
                 Top_post(api)
         except:
             try:
                 api.update_status(status= Estado + " " + submission.url + " #Astronomy #Space") #Subir tweet
                 Z = funcs.Scheduling("TOP_last_sub.txt")
                 Z.set_NewSub(chosen_sub)
-                print("[" + funcs.getTime() + "] Se publico el tweet del subreddit: " + chosen_sub)
+                print("Se publico el tweet del subreddit: " + chosen_sub)
             except tweepy.error.TweepError as e:
                 if("'code': 186" in str(e)):
                     PostsToAvoid.append(funcs.process_title(submission.title))
-                    print("[" + funcs.getTime() + "] Se agrego a los posts para no publicar: " + funcs.process_title(submission.title) + ". Se ejecutara de nuevo la función.")
+                    print("Se agrego a los posts para no publicar: " + funcs.process_title(submission.title) + ". Se ejecutara de nuevo la función.")
                     Top_post(api)
                 else:
                     print(str(e))
@@ -88,15 +87,15 @@ def Top_post(api):
             api.update_status(status= Estado + " " + submission.url + " #Astronomy #Space")
             Z = funcs.Scheduling("TOP_last_sub.txt")
             Z.set_NewSub(chosen_sub)
-            print("[" + funcs.getTime() + "] Se publico el tweet del subreddit: " + chosen_sub)
+            print("Se publico el tweet del subreddit: " + chosen_sub)
         except tweepy.error.TweepError as e:
                 if("'code': 186" in str(e)):
                     PostsToAvoid.append(funcs.process_title(submission.title))
-                    print("[" + funcs.getTime() + "] Se agrego a los posts para no publicar: " + funcs.process_title(submission.title) + ". Se ejecutara de nuevo la función.")
+                    print("Se agrego a los posts para no publicar: " + funcs.process_title(submission.title) + ". Se ejecutara de nuevo la función.")
                     Top_post(api)
                 else:
                     print(str(e))
-    print("[" + funcs.getTime() + "] Se termina la funcion de redditAPI.py: Top_post(api)\n")
+    print("Se termina la funcion de redditAPI.py: Top_post(api)\n")
     return None
 
 def get_new(chosen_sub, LIMITE, Tweets): 
@@ -109,12 +108,12 @@ def get_new(chosen_sub, LIMITE, Tweets):
 
     for post in submissions_list:
         if(funcs.isOriginal(post.title, Tweets) and funcs.CheckInPosts(funcs.process_title(post.title))):
-            print("[" + funcs.getTime() + "] Se procesa: " +  post.title)
+            print("Se procesa: " +  post.title)
             return post
     return get_new(chosen_sub, LIMITE + 5, Tweets)
 
 def New_post(api):
-    print("[" + funcs.getTime() + "] Se empieza la función de redditAPI.py: New_post(api)")
+    print("Se empieza la función de redditAPI.py: New_post(api)")
     chosen_sub = Choose_subreddit("BEST5_last_sub.txt")
     TIMELINE_ACTUAL= tweepy.Cursor(api.user_timeline, screen_name=api.me().screen_name, tweet_mode="extended").items()
     Tweets = []
@@ -147,28 +146,28 @@ def New_post(api):
                     api.update_with_media(filename= img_path, status= Estado + " #Astronomy #Space")
                     Z = funcs.Scheduling("BEST5_last_sub.txt")
                     Z.set_NewSub(chosen_sub)
-                    print("[" + funcs.getTime() + "] Se publico el tweet del subreddit: " + chosen_sub)
+                    print("Se publico el tweet del subreddit: " + chosen_sub)
                 except tweepy.error.TweepError as e:
                     if("'code': 186" in str(e)):
                         PostsToAvoid.append(funcs.process_title(best_one.title))
-                        print("[" + funcs.getTime() + "] Se agrego a los posts para no publicar: " + funcs.process_title(best_one.title) + ". Se ejecutara de nuevo la función.")
+                        print("Se agrego a los posts para no publicar: " + funcs.process_title(best_one.title) + ". Se ejecutara de nuevo la función.")
                         New_post(api)
                     else:
                         print(str(e))
             else:
                 PostsToAvoid.append(funcs.process_title(best_one.title))
-                print("[" + funcs.getTime() + "] Se agrego a los posts para no publicar: " + funcs.process_title(best_one.title) + ". Se ejecutara de nuevo la función.")
+                print("Se agrego a los posts para no publicar: " + funcs.process_title(best_one.title) + ". Se ejecutara de nuevo la función.")
                 New_post(api)
         except:
             try:
                 api.update_status(status= Estado + " " + best_one.url + " #Astronomy #Space")
                 Z = funcs.Scheduling("BEST5_last_sub.txt")
                 Z.set_NewSub(chosen_sub)
-                print("[" + funcs.getTime() + "] Se publico el tweet del subreddit: " + chosen_sub)
+                print("Se publico el tweet del subreddit: " + chosen_sub)
             except tweepy.error.TweepError as e:
                 if("'code': 186" in str(e)):
                     PostsToAvoid.append(funcs.process_title(best_one.title))
-                    print("[" + funcs.getTime() + "] Se agrego a los posts para no publicar: " + funcs.process_title(best_one.title) + ". Se ejecutara de nuevo la función.")
+                    print("Se agrego a los posts para no publicar: " + funcs.process_title(best_one.title) + ". Se ejecutara de nuevo la función.")
                     New_post(api)
                 else:
                     print(str(e))
@@ -183,13 +182,13 @@ def New_post(api):
             api.update_status(status= Estado + " " + best_one.url + " #Astronomy #Space")
             Z = funcs.Scheduling("BEST5_last_sub.txt")
             Z.set_NewSub(chosen_sub)
-            print("[" + funcs.getTime() + "] Se publico el tweet del subreddit: " + chosen_sub)
+            print("Se publico el tweet del subreddit: " + chosen_sub)
         except tweepy.error.TweepError as e:
             if("'code': 186" in str(e)):
                 PostsToAvoid.append(funcs.process_title(best_one.title))
-                print("[" + funcs.getTime() + "] Se agrego a los posts para no publicar: " + funcs.process_title(best_one.title) + ". Se ejecutara de nuevo la función.")
+                print("Se agrego a los posts para no publicar: " + funcs.process_title(best_one.title) + ". Se ejecutara de nuevo la función.")
                 New_post(api)
             else:
                 print(str(e))
-    print("[" + funcs.getTime() + "] Se termina la funcion de redditAPI.py: New_post(api)\n")
+    print("Se termina la funcion de redditAPI.py: New_post(api)\n")
     return None

@@ -1,6 +1,5 @@
 from PIL import Image #Necesario para redimensionar la imagen
 from os import path
-from datetime import datetime
 from resizeimage import resizeimage #Necesario para redimensionar la imagen
 from variables import Subreddits_list, PostsToAvoid
 
@@ -19,7 +18,7 @@ def Redimensionar(img_path): #Redimensiona la imagen si se excede de los limites
     with Image.open(img_path) as image:
         width, height = image.size
         if(width > RES_LIMIT or height > RES_LIMIT):
-            print("[" + getTime() + "] Se redimensiona la imagen")
+            print("Se redimensiona la imagen")
             new_size = (RES_LIMIT, RES_LIMIT)
             try:
                 image.thumbnail(new_size, Image.ANTIALIAS)
@@ -27,19 +26,19 @@ def Redimensionar(img_path): #Redimensiona la imagen si se excede de los limites
 
                 #Tratar de reducir el tamaño del archivo. Si despues de tres veces sigue excediendo 3072kb, devuelve Falso
                 if((path.getsize(img_path) / 1024) > 3072):
-                    for i in range(3):
+                    for _ in range(3):
                         image.save(img_path, optimize= True, quality= 95)
                         if((path.getsize(img_path) / 1024) < 3072):
                             break
                     else: #Si sigue excediendo 3072kb
-                        print("[" + getTime() + "] La imagen sigue teniendo un tamaño de archivo muy grande: " + str(path.getsize(img_path) / 1024) + " kb.")
+                        print("La imagen sigue teniendo un tamaño de archivo muy grande: " + str(path.getsize(img_path) / 1024) + " kb.")
                         return False
 
             except Exception as e:
-                print("[" + getTime() + "] Ha ocurrido una excepción al redimensionar la imagen: " + str(e))
+                print("Ha ocurrido una excepción al redimensionar la imagen: " + str(e))
                 return False
         else:
-            print("[" + getTime() + "] No es necesario redimensionar la imagen")
+            print("No es necesario redimensionar la imagen")
     return True
 
 def isOriginal(titulo, TWEETS): #Comprueba si el post elegido para publicarse ya fue publicado en el timeline del bot
@@ -49,9 +48,6 @@ def isOriginal(titulo, TWEETS): #Comprueba si el post elegido para publicarse ya
     else: #Si no se ejecuta el break
         return True
     return False
-
-def getTime():
-    return datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
 class Scheduling():
     """ 

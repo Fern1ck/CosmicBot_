@@ -1,13 +1,12 @@
 import requests
 from datetime import datetime
-from funcs import getTime
 
 def Post(api):
-    print("[" + getTime() + "] Se empieza la funcion de nasaAPI.py: Post(api)")
+    print("Se empieza la funcion de nasaAPI.py: Post(api)")
     # Si no es el primer dia del mes no hace nada
     day_of_month = datetime.today().day
     if day_of_month != 1:
-        print("[" + getTime() + "] Hoy no es el primero del mes. No se publicó el estado de los astronautas.")
+        print("Hoy no es el primero del mes. No se publicó el estado de los astronautas.")
         return None
 
     try:
@@ -36,11 +35,11 @@ def Post(api):
                     Hashtags= Hashtags + " #" + Craft
                     
                 api.update_status(Estado + " #Astronomy #Space" + Hashtags)
-                print("[" + getTime() + "] Se publicó el estado con los astronautas actuales en el espacio.")
+                print("Se publicó el estado con los astronautas actuales en el espacio.")
             else:
                 api.update_status("At the moment, there are no astronauts in space. #Astronomy #Space")
-                print("[" + getTime() + "] Se publicó el estado con los astronautas actuales en el espacio.")
+                print("Se publicó el estado con los astronautas actuales en el espacio.")
     except:
-        print("[" + getTime() + "] Hubo un error en el fetch o publicación de los astronautas. No se publicó el estado de los astronautas.")
-    print("[" + getTime() + "] Se termina la funcion de nasaAPI.py: Post(api)")
+        print("Hubo un error en el fetch o publicación de los astronautas. No se publicó el estado de los astronautas.")
+    print("Se termina la funcion de nasaAPI.py: Post(api)")
     return None

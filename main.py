@@ -1,5 +1,4 @@
 import tweepy, requests, schedule, redditAPI, nasaAPI, astronauts, time
-from funcs import getTime
 from variables import TWIITER_CONSUMER_KEY, TWIITER_CONSUMER_SECRET, TWIITER_ACCESS_TOKEN, TWIITER_ACCESS_TOKEN_SECRET
 
 #Autenticacion del bot
@@ -15,7 +14,7 @@ TOP_TIME_3= "17:00"
 NEW_TIME_1= "18:00"
 NEW_TIME_2= "22:00"
 NEW_TIME_3= "00:00"
-MINUTOS = 15
+MINUTOS = 20
 
 #Se declaran las tareas diarias a ejecutar
 schedule.every().day.at(ASTRONAUTS).do(astronauts.Post, api)
@@ -27,8 +26,8 @@ schedule.every().day.at(NEW_TIME_1).do(redditAPI.New_post, api)
 schedule.every().day.at(NEW_TIME_2).do(redditAPI.New_post, api)
 schedule.every().day.at(NEW_TIME_3).do(redditAPI.New_post, api)
 
-print("[" + getTime() + "] Empiezan a ejecutarse las tareas...")
+print("Empiezan a ejecutarse las tareas...")
 while(True):
     schedule.run_pending()
-    print("[" + getTime() + "] La ejecución se para por " + str(MINUTOS) + " minutos.")
+    print("La ejecución se para por " + str(MINUTOS) + " minutos.")
     time.sleep(MINUTOS * 60) #Evita la ejecucion constante del bucle
